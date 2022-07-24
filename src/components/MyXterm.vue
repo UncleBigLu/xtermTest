@@ -12,18 +12,35 @@ import "xterm/css/xterm.css"
 export default {
   name: "MyXterm",
   props:{
-    socketURL: String,
+    socket_url: String,
   },
   methods: {
+    initSocket() {
+      var socket = new WebSocket(this.socket_url);
+      socket.onopen = () => {
+        this.term.write('Websocket opened.\n');
+      }
+      socket.onclose = () => {
+        this.term.write('Websocket closed. Reconnect will be attempted after 2 second.\n');
+        setTimeout( () => {
+          this.initSocket();
+        }, 2000);
+      }
+      socket.onerror = () => {
+        socket.close();
+      };
+      const attachAddon = new AttachAddon(socket);
+      this.term.loadAddon(attachAddon);
+    },
     initTerm() {
       const term = new Terminal({
         cursorBlink: true,
         disableStdin: false,
         convertEol: true
       });
+      this.term = term;
       const fitAddon = new FitAddon();
-      var socket = new WebSocket(this.socketURL);
-      const attachAddon = new AttachAddon()
+      this.initSocket();
       term.loadAddon(fitAddon);
 
       term.open(document.getElementById('terminal-container'));
@@ -48,7 +65,6 @@ export default {
 
       term.write('Hello from \x1B[1;3;31mxterm.js\x1B[0m ');
       term.promt();
-      this.term = term;
     },
   },
   mounted() {

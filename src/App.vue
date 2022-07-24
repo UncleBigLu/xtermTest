@@ -1,6 +1,6 @@
 <template>
 
-  <MyXterm></MyXterm>
+  <MyXterm socket_url="ws://127.0.0.1:23333"></MyXterm>
 </template>
 
 <script>
