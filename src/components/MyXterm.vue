@@ -5,11 +5,15 @@
 <script>
 import {Terminal} from 'xterm';
 import {FitAddon} from 'xterm-addon-fit';
+import {AttachAddon} from 'xterm-addon-attach';
 import "xterm/css/xterm.css"
 
 
 export default {
   name: "MyXterm",
+  props:{
+    socketURL: String,
+  },
   methods: {
     initTerm() {
       const term = new Terminal({
@@ -18,6 +22,8 @@ export default {
         convertEol: true
       });
       const fitAddon = new FitAddon();
+      var socket = new WebSocket(this.socketURL);
+      const attachAddon = new AttachAddon()
       term.loadAddon(fitAddon);
 
       term.open(document.getElementById('terminal-container'));
